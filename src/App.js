@@ -1,25 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 function App() {
+  const [techs, setTechs] = useState([]);
+  const [newTech, setNewTech] = useState('');
+
+  const techsCount = useMemo(() => techs.length, [techs]);
+
+  useEffect(() => {
+    const t = localStorage.getItem('techs');
+    if (t) setTechs(JSON.parse(t));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('techs', JSON.stringify(techs));
+  }, [techs]);
+
+  const handleInputChange = useCallback(e => {
+    setNewTech(e.target.value);
+  }, []);
+
+  const handleAdd = useCallback(() => {
+    setTechs([...techs, newTech]);
+    setNewTech('');
+  }, [newTech, techs]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <input value={newTech} onChange={handleInputChange} />
+      <button type="button" onClick={handleAdd}>
+        Add technology
+      </button>
+      <p>There are {techsCount} technologies in your list.</p>
+      <ul>
+        {techs.map(tech => (
+          <li key={tech}>{tech}</li>
+        ))}
+      </ul>
+    </>
   );
 }
 
